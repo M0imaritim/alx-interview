@@ -9,16 +9,22 @@ def makeChange(coins, total):
     if not coins:
         return -1
 
-    coins = [coin for coin in coins if coin <= total]
-    if not coins:
+    unique_coins = sorted(set(coin for coin in coins if 0 < coin <= total),
+                          reverse=True)
+    if not unique_coins:
         return -1
 
-    dp = [float('inf')] * (total + 1)
+    if unique_coins[0] == total:
+        return 1
+
+    dp = [total + 1] * (total + 1)
     dp[0] = 0
 
-    for coin in coins:
-        for i in range(coin, total + 1):
-            if dp[i - coin] != float('inf'):
-                dp[i] = min(dp[i], dp[i - coin] + 1)
+    for coin in unique_coins:
+        for amount in range(coin, total + 1):
+            if dp[amount - coin] < total + 1:
+                new_count = dp[amount - coin] + 1
+                if new_count < dp[amount]:
+                    dp[amount] = new_count
 
-    return dp[total] if dp[total] != float('inf') else -1
+    return dp[total] if dp[total] <= total else -1
